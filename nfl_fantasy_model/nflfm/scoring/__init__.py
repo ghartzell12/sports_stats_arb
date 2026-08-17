@@ -2,6 +2,7 @@
 
 from .frame import add_fantasy_points, score_frame
 from .rules import (
+    DK_BEST_BALL,
     HALF_PPR,
     PPR,
     PRESETS,
@@ -12,6 +13,7 @@ from .rules import (
 )
 
 __all__ = [
+    "DK_BEST_BALL",
     "HALF_PPR",
     "PPR",
     "PRESETS",

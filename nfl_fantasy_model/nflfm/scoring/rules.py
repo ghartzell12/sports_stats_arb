@@ -122,9 +122,33 @@ TE_PREMIUM = ScoringRules(
     reception_premiums={"TE": 0.5},
 )
 
+#: DraftKings NFL scoring, used by their best ball contests.
+#:
+#: Differs from generic PPR in three ways that matter for a ceiling-driven
+#: best ball model: turnovers cost 1 point rather than 2, and there are +3
+#: bonuses at 300 passing / 100 rushing / 100 receiving yards. The bonuses are
+#: what make DK best ball a spike-hunting format — a 100-yard game is worth
+#: 13 points, not 10, so week-to-week variance is directly rewarded.
+DK_BEST_BALL = ScoringRules(
+    name="dk_best_ball",
+    passing_yards=0.04,
+    passing_tds=4.0,
+    passing_interceptions=-1.0,
+    rushing_yards=0.1,
+    rushing_tds=6.0,
+    receptions=1.0,
+    receiving_yards=0.1,
+    receiving_tds=6.0,
+    fumbles_lost=-1.0,
+    special_teams_tds=6.0,
+    passing_yard_bonuses={300: 3.0},
+    rushing_yard_bonuses={100: 3.0},
+    receiving_yard_bonuses={100: 3.0},
+)
+
 #: Rulesets addressable by name from the CLI.
 PRESETS: dict[str, ScoringRules] = {
-    r.name: r for r in (STANDARD, HALF_PPR, PPR, TE_PREMIUM)
+    r.name: r for r in (STANDARD, HALF_PPR, PPR, TE_PREMIUM, DK_BEST_BALL)
 }
 
 
