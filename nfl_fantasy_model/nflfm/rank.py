@@ -184,3 +184,72 @@ def best_ball_value(
         surplus = np.maximum(draws[i] - baseline, 0.0)
         values[i] = surplus.sum(axis=-1).mean()
     return values
+
+
+def historical_replacement_ppg(
+    weekly: pd.DataFrame,
+    ranks: dict[str, int] | None = None,
+    target: str = "fp",
+    min_games: int = 6,
+) -> dict[str, float]:
+    """Replacement-level points per game, measured across past seasons.
+
+    Ranking *within the supplied projection set* is unsafe: a props file that
+    covers 33 running backs puts "RB32" on the second-worst back in the file,
+    which is nothing like the RB32 a drafter actually faces. That understates
+    replacement level and inflates every running back's value over it.
+
+    Measuring the Nth-best player at each position in each historical season
+    and averaging gives a level that does not move with how many players a
+    given data source happens to include.
+    """
+    ranks = ranks or REPLACEMENT_RANK
+    frame = weekly.copy()
+    per_season = (
+        frame.groupby(["player_id", "position", "season"], observed=True)[target]
+        .agg(games="size", points="sum")
+        .reset_index()
+    )
+    per_season = per_season[per_season["games"] >= min_games]
+    per_season["ppg"] = per_season["points"] / per_season["games"]
+
+    levels: dict[str, float] = {}
+    for position, rank_needed in ranks.items():
+        subset = per_season[per_season["position"] == position]
+        if subset.empty:
+            continue
+        by_season = []
+        for _, group in subset.groupby("season", observed=True):
+            ordered = group["ppg"].sort_values(ascending=False).to_numpy()
+            if len(ordered) >= rank_needed:
+                by_season.append(ordered[rank_needed - 1])
+        if by_season:
+            levels[position] = float(np.mean(by_season))
+    return levels
+
+
+def synthetic_replacement_draws(
+    levels: dict[str, float],
+    index,
+    sims: int,
+    weeks: int,
+    seed: int = 99,
+) -> dict[str, np.ndarray]:
+    """Weekly draws for a replacement player at each position's measured level."""
+    rng = np.random.default_rng(seed)
+    baselines: dict[str, np.ndarray] = {}
+    for position, ppg in levels.items():
+        columns = comparables.FEATURES.get(position)
+        if columns is None:
+            continue
+        history = index.features
+        subset = history[
+            (history["position"] == position) & (history["ppg"].sub(ppg).abs() <= 2.0)
+        ]
+        if subset.empty:
+            subset = history[history["position"] == position]
+        query = {c: float(subset[c].median()) for c in columns}
+        query["ppg"] = ppg
+        pool = index.shape_pool(position, query, k=comparables.DEFAULT_K)
+        baselines[position] = rng.choice(pool, size=(sims, weeks)) * ppg
+    return baselines

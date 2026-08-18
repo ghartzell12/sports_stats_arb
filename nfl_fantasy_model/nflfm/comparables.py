@@ -26,11 +26,15 @@ import pandas as pd
 
 #: Features used to match players, by position group. All are per-game rates
 #: or ratios, so they are comparable across eras and workloads.
+#: Every feature must be computable *both* from historical box scores and from
+#: sportsbook component lines, or a 2026 player cannot be matched against
+#: history at all. That rules out air-yards-based measures like aDOT, which no
+#: book prices; yards per reception stands in for it.
 FEATURES: dict[str, tuple[str, ...]] = {
-    "QB": ("ppg", "pass_att_pg", "rush_att_pg", "td_dependence"),
-    "RB": ("ppg", "touch_pg", "target_share_of_touches", "td_dependence"),
-    "WR": ("ppg", "target_pg", "adot", "td_dependence"),
-    "TE": ("ppg", "target_pg", "adot", "td_dependence"),
+    "QB": ("ppg", "pass_yards_pg", "rush_yards_pg", "td_dependence"),
+    "RB": ("ppg", "rush_yards_pg", "rec_pg", "td_dependence"),
+    "WR": ("ppg", "rec_pg", "ypr", "td_dependence"),
+    "TE": ("ppg", "rec_pg", "ypr", "td_dependence"),
 }
 
 MIN_GAMES = 6
@@ -52,6 +56,9 @@ def season_features(weekly: pd.DataFrame, target: str = "fp") -> pd.DataFrame:
         "targets",
         "carries",
         "attempts",
+        "passing_yards",
+        "rushing_yards",
+        "receiving_yards",
         "receiving_air_yards",
         "receptions",
         "passing_tds",
@@ -69,6 +76,9 @@ def season_features(weekly: pd.DataFrame, target: str = "fp") -> pd.DataFrame:
         targets=("targets", "sum"),
         carries=("carries", "sum"),
         pass_att=("attempts", "sum"),
+        pass_yards_total=("passing_yards", "sum"),
+        rush_yards_total=("rushing_yards", "sum"),
+        rec_yards_total=("receiving_yards", "sum"),
         air_yards=("receiving_air_yards", "sum"),
         receptions=("receptions", "sum"),
         pass_td=("passing_tds", "sum"),
@@ -79,6 +89,14 @@ def season_features(weekly: pd.DataFrame, target: str = "fp") -> pd.DataFrame:
     agg = agg[agg["games"] >= MIN_GAMES].copy()
     agg["ppg"] = agg["points"] / agg["games"]
     agg["target_pg"] = agg["targets"] / agg["games"]
+    agg["rec_pg"] = agg["receptions"] / agg["games"]
+    agg["pass_yards_pg"] = agg["pass_yards_total"] / agg["games"]
+    agg["rush_yards_pg"] = agg["rush_yards_total"] / agg["games"]
+    agg["ypr"] = np.where(
+        agg["receptions"] > 0,
+        agg["rec_yards_total"] / agg["receptions"].replace(0, np.nan),
+        0.0,
+    )
     agg["pass_att_pg"] = agg["pass_att"] / agg["games"]
     agg["rush_att_pg"] = agg["carries"] / agg["games"]
     agg["touch_pg"] = (agg["carries"] + agg["receptions"]) / agg["games"]
@@ -94,7 +112,7 @@ def season_features(weekly: pd.DataFrame, target: str = "fp") -> pd.DataFrame:
     total_td = agg["pass_td"] * 4 + (agg["rush_td"] + agg["rec_td"]) * 6
     agg["td_dependence"] = np.where(agg["points"] > 0, total_td / agg["points"], 0.0)
 
-    return agg.replace([np.inf, -np.inf], np.nan).fillna({"adot": 0.0})
+    return agg.replace([np.inf, -np.inf], np.nan).fillna({"adot": 0.0, "ypr": 0.0})
 
 
 def weekly_shapes(weekly: pd.DataFrame, target: str = "fp") -> pd.DataFrame:

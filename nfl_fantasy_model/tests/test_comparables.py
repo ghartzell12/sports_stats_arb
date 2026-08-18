@@ -62,7 +62,7 @@ def test_describe_handles_a_constant_pool():
 
 
 def test_neighbours_are_ordered_by_distance(index):
-    query = {"ppg": 12.0, "target_pg": 5.0, "adot": 11.0, "td_dependence": 0.3}
+    query = {"ppg": 12.0, "rec_pg": 5.0, "ypr": 11.0, "td_dependence": 0.3}
     comps = index.neighbours("WR", query, k=5)
     assert len(comps) == 5
     assert comps["distance"].is_monotonic_increasing
@@ -70,15 +70,15 @@ def test_neighbours_are_ordered_by_distance(index):
 
 def test_closest_comp_is_the_most_similar_level(index):
     """Holding the other features fixed, a higher query matches higher seasons."""
-    fixed = {"target_pg": 5.0, "adot": 11.0, "td_dependence": 0.3}
+    fixed = {"rec_pg": 5.0, "ypr": 11.0, "td_dependence": 0.3}
     low = index.neighbours("WR", {"ppg": 7.0, **fixed}, k=3)
     high = index.neighbours("WR", {"ppg": 20.0, **fixed}, k=3)
     assert low["ppg"].mean() < high["ppg"].mean()
 
 
 def test_missing_features_are_reported_by_name(index):
-    with pytest.raises(KeyError, match="adot"):
-        index.neighbours("WR", {"ppg": 12.0, "target_pg": 5.0, "td_dependence": 0.3})
+    with pytest.raises(KeyError, match="ypr"):
+        index.neighbours("WR", {"ppg": 12.0, "rec_pg": 5.0, "td_dependence": 0.3})
 
 
 def test_unknown_position_is_rejected(index):
@@ -87,19 +87,19 @@ def test_unknown_position_is_rejected(index):
 
 
 def test_shape_pool_is_scale_free(index):
-    query = {"ppg": 12.0, "target_pg": 5.0, "adot": 11.0, "td_dependence": 0.3}
+    query = {"ppg": 12.0, "rec_pg": 5.0, "ypr": 11.0, "td_dependence": 0.3}
     pool = index.shape_pool("WR", query, k=10)
     assert pool.mean() == pytest.approx(1.0, abs=0.15)
     assert pool.size > 0
 
 
 def test_more_neighbours_widen_the_pool(index):
-    query = {"ppg": 12.0, "target_pg": 5.0, "adot": 11.0, "td_dependence": 0.3}
+    query = {"ppg": 12.0, "rec_pg": 5.0, "ypr": 11.0, "td_dependence": 0.3}
     assert index.shape_pool("WR", query, k=10).size > index.shape_pool("WR", query, k=3).size
 
 
 def test_moments_are_returned_for_a_query(index):
-    query = {"ppg": 12.0, "target_pg": 5.0, "adot": 11.0, "td_dependence": 0.3}
+    query = {"ppg": 12.0, "rec_pg": 5.0, "ypr": 11.0, "td_dependence": 0.3}
     stats = index.moments("WR", query, k=10)
     assert {"cv", "skew", "kurtosis"} <= set(stats)
 
