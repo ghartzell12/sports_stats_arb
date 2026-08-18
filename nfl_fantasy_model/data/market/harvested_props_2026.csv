@@ -1,0 +1,23 @@
+player,position,team,market,line,side,american_odds,book,as_of,source,note
+Jared Goff,QB,DET,pass_yards,4099.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Dak Prescott,QB,DAL,pass_yards,3999.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Matthew Stafford,QB,LAR,pass_yards,3999.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Justin Herbert,QB,LAC,pass_yards,3650.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Jordan Love,QB,GB,pass_yards,3549.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Jalen Hurts,QB,PHI,pass_yards,3249.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Lamar Jackson,QB,BAL,pass_yards,3249.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Saquon Barkley,RB,PHI,rush_yards,1075.5,two_way,-110,DraftKings,2026-08-10,foxsports,line only; odds assumed standard
+Amon-Ra St. Brown,WR,DET,rec_yards,1200.5,two_way,-110,DraftKings,2026-08-13,foxsports,line only; odds assumed standard
+CeeDee Lamb,WR,DAL,rec_yards,1175.5,two_way,-110,DraftKings,2026-08-13,foxsports,line only; odds assumed standard
+Drake London,WR,ATL,rec_yards,1125.5,two_way,-110,DraftKings,2026-08-13,foxsports,line only; odds assumed standard
+Puka Nacua,WR,LAR,rec_yards,1250,over,-200,DraftKings,2026-08-13,foxsports,one-sided quote
+Puka Nacua,WR,LAR,rec_yards,1500,over,140,DraftKings,2026-07-07,bleachernation,one-sided quote
+Jaxon Smith-Njigba,WR,SEA,rec_yards,1250,over,-200,DraftKings,2026-08-13,foxsports,one-sided quote
+Jaxon Smith-Njigba,WR,SEA,rec_yards,1500,over,150,DraftKings,2026-07-07,bleachernation,one-sided quote
+Ja'Marr Chase,WR,CIN,rec_yards,1250,over,-200,DraftKings,2026-08-13,foxsports,one-sided quote
+Ja'Marr Chase,WR,CIN,rec_yards,1500,over,150,DraftKings,2026-07-07,bleachernation,one-sided quote
+Justin Jefferson,WR,MIN,rec_yards,1250,over,120,DraftKings,2026-08-13,foxsports,one-sided quote
+Amon-Ra St. Brown,WR,DET,rec_yards,1250,over,-110,DraftKings,2026-08-13,foxsports,one-sided quote
+CeeDee Lamb,WR,DAL,rec_yards,1250,over,100,DraftKings,2026-08-13,foxsports,one-sided quote
+Drake London,WR,ATL,rec_yards,1250,over,120,DraftKings,2026-08-13,foxsports,one-sided quote
+Nico Collins,WR,HOU,rec_yards,1250,over,150,DraftKings,2026-08-13,foxsports,one-sided quote
