@@ -127,7 +127,58 @@ tbody tr:last-child td{border-bottom:0}
 
 /* ---- draft room ---- */
 .two{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;align-items:start}
+/* Grid and flex children default to min-width:auto, so a column refuses to
+   shrink below its widest un-wrappable child and pushes the page sideways.
+   Everything here is allowed to shrink and let its own content wrap instead. */
+.two>*,.grid>*,.bar>*{min-width:0}
+.draftbar input[type=number]{width:64px}
 @media(max-width:900px){.two{grid-template-columns:1fr}}
+
+/* ---- phone ----
+   During a live draft the recommendation is what you need first, then the pool
+   to tap a pick into, then the roster. On desktop the pool sits alongside, so
+   source order is fine; on a phone it has to be reordered explicitly. */
+@media(max-width:720px){
+  .wrap{padding:0 14px}
+  /* align-items:start is right for the desktop grid, but in a flex column it
+     sizes items to their content instead of the container, so the column takes
+     its min-content width and pushes the page sideways. Stretch them back. */
+  #v-draft .two{display:flex;flex-direction:column;gap:12px;align-items:stretch}
+  #v-draft .two>.grid{display:contents}
+  #v-draft .two>div:first-child{order:2}
+  #reccard{order:1}
+  .rosterCard{order:3}
+  .runwayCard{order:4}
+
+  .draftbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;align-items:end}
+  .draftbar .note{display:flex;flex-direction:column;gap:3px;font-size:11px}
+  .draftbar input[type=number]{width:100%}
+  .draftbar .spacer{display:none}
+  .draftbar .reset{grid-column:1/-1;min-height:40px}
+
+  .bar input[type=search]{flex:1 1 100%;width:100%;max-width:none}
+  #v-draft .chips{width:100%}
+  #v-draft .chip{flex:1;text-align:center;padding:9px 4px}
+
+  /* thumb-sized controls, and room for the name beside them */
+  .pool{max-height:56vh}
+  .prow{padding:9px 10px;gap:8px}
+  .prow .badge{width:24px;height:24px;font-size:9px}
+  .mini{min-height:38px;padding:0 11px}
+  .rec .tiles{grid-template-columns:1fr 1fr}
+  .phead h2{font-size:22px}
+  .tile .v{font-size:19px}
+  h1{font-size:22px}
+}
+@media(max-width:400px){
+  #v-draft .chip{font-size:11px;padding:9px 2px}
+  /* Keep the value visible — it is the reason to look at the row at all.
+     Buy the space back from the buttons and the badge instead. */
+  .prow{gap:6px;padding:8px}
+  .prow .badge{width:22px;height:22px;font-size:8px}
+  .prow .mini{padding:0 8px;font-size:10.5px}
+  .prow .pos{padding:2px 5px;font-size:10px}
+}
 .pool{max-height:560px;overflow-y:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
 .prow{display:flex;align-items:center;gap:9px;padding:8px 12px;border-bottom:1px solid var(--line-soft)}
 .prow:last-child{border-bottom:0}
@@ -238,12 +289,12 @@ footer{color:var(--ink-3);font-size:12px;padding:26px 0 40px;line-height:1.7}
 
 <!-- ===================== DRAFT ROOM ===================== -->
 <section id="v-draft" class="hidden">
-  <div class="bar">
-    <label class="note">Teams <input type="number" id="nteams" value="12" min="2" max="20" style="width:64px" oninput="recompute()"></label>
-    <label class="note">Your slot <input type="number" id="slot" value="6" min="1" max="20" style="width:64px" oninput="recompute()"></label>
-    <label class="note">Round <input type="number" id="round" value="1" min="1" max="20" style="width:64px" oninput="recompute()"></label>
+  <div class="bar draftbar">
+    <label class="note">Teams <input type="number" id="nteams" value="12" min="2" max="20" oninput="recompute()"></label>
+    <label class="note">Your slot <input type="number" id="slot" value="6" min="1" max="20" oninput="recompute()"></label>
+    <label class="note">Round <input type="number" id="round" value="1" min="1" max="20" oninput="recompute()"></label>
     <div class="spacer"></div>
-    <button class="mini" onclick="resetDraft()">Reset draft</button>
+    <button class="mini reset" onclick="resetDraft()">Reset draft</button>
   </div>
   <div class="two">
     <div>
@@ -267,8 +318,8 @@ footer{color:var(--ink-3);font-size:12px;padding:26px 0 40px;line-height:1.7}
     </div>
     <div class="grid" style="gap:12px">
       <div class="card rec" id="reccard"></div>
-      <div class="card"><h3>Your roster</h3><div id="roster"></div></div>
-      <div class="card"><h3>Positional runway</h3><div id="runway"></div>
+      <div class="card rosterCard"><h3>Your roster</h3><div id="roster"></div></div>
+      <div class="card runwayCard"><h3>Positional runway</h3><div id="runway"></div>
         <p class="note" style="margin-top:10px">How much value is left at each position, and what
         survives to your next pick.</p>
       </div>
